@@ -1,10 +1,9 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+## mysqldiff 0.43
+## 
+## Run on Wed May 23 21:45:15 2012
+## Options: user=root, debug=0, host=localhost
+##
+## ---   db: test2 (host=localhost user=root)
+## +++   db: test (host=localhost user=root)
 
-ALTER TABLE `test`.`new_table` ADD COLUMN `b` VARCHAR(45) NULL DEFAULT NULL  AFTER `a` ;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+ALTER TABLE new_table ADD COLUMN b varchar(45) DEFAULT NULL;
