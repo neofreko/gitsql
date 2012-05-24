@@ -32,6 +32,9 @@ def commitsql(app):
 	commands.getoutput('cat %s > sql-diff.sql' % tmp_file)
 	print commands.getoutput('git commit sql-diff.sql -m "sql diff %s"' % strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
 
+	#cleaning up
+	print commands.getoutput("rm %s" % tmp_file)
+
 commitsql.add_param("-d", "--dbname", help="prepare a comparison db for internal sql diffing in each commit", default="test", action="store")
 commitsql.add_param("-m", "--mysqldiff", help="mysqldiff executable path", default="mysqldiff", action="store")
 commitsql.add_param("-u", "--user", help="mysql user", default="root", action="store")
