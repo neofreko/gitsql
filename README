@@ -1,7 +1,9 @@
 Dependencies:
 1. MySQL::Diff from CPAN
 2. mysql and its utilities should be on $PATH. Pay attention if you are on Mac OSX and using MAMP or whatnot ;)
+3. PyCLI (http://packages.python.org/pyCLI/). $ pip install pyCLI
 
+Steps:
 0. You need to have prior revision before placing these script as part of git-hook scripts!
 1. use preparedb.py to sync your current schema to versioning db (internals of gitsql). eg: ./preparedb.py -d dbname <SHA1 of current revision>
 2. place the pre-commit and post-pull hook
