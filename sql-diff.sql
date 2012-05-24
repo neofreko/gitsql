@@ -1,9 +1,18 @@
 ## mysqldiff 0.43
 ## 
-## Run on Wed May 23 21:47:12 2012
+## Run on Thu May 24 12:57:19 2012
 ## Options: user=root, debug=0, host=localhost
 ##
-## ---   db: test2 (host=localhost user=root)
+## ---   db: test_test (host=localhost user=root)
 ## +++   db: test (host=localhost user=root)
 
-ALTER TABLE new_table ADD INDEX idx_b (b);
+CREATE TABLE new_table (
+  a int(11) NOT NULL,
+  b varchar(45) DEFAULT NULL,
+  c varchar(45) DEFAULT NULL,
+  PRIMARY KEY (a),
+  KEY idx_b (b)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+
