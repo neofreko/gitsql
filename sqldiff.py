@@ -13,7 +13,7 @@ def sqldiff(app):
 	for x in diff:
 		print commands.getoutput("git show %s:sql-diff.sql" % x)
 
-sqldiff.add_param("revision", help="revision param to pass to git log, eg: x..y", default="HEAD", action="store")
+sqldiff.add_param("revision", help="revision param to pass to git log, eg: x..y", default="HEAD`	", action="store")
 
 
 if __name__ == "__main__":

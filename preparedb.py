@@ -4,7 +4,7 @@ import commands
 
 @cli.app.CommandLineApp
 def preparedb(app):
-	print "Preparing comparison db: %s\n" % app.params.dbname
+	print "Preparing comparison db: test_%s\n" % app.params.dbname
 	if (app.params.password):
 		print "I will need mysql password for user '%s'\n" % app.params.user
 	min_p = ''
@@ -24,9 +24,15 @@ def preparedb(app):
 		print "Copying schema.."
 		print commands.getoutput("mysqldump -n -d -u %s %s > %s" % (app.params.user, app.params.dbname, tmp_schema))
 		print commands.getoutput("mysql -u %s -e 'source %s;' %s" % (app.params.user, tmp_schema, app.params.dbname))
+
+		# create version table (sqldiff) on subject db
+		print commands.getoutput("mysql -u %s -e  'CREATE TABLE `sqldiff` ( `version` varchar(100) NOT NULL, PRIMARY KEY (`version`)) ENGINE=MyISAM DEFAULT CHARSET=latin1; INSERT INTO sqldiff values(\"%s\")' %s" % (app.params.user, app.params.revision, app.params.dbname))
+
+		# create version table (sqldiff) on test_db
+		print commands.getoutput("mysql -u %s -e  'CREATE TABLE `sqldiff` ( `version` varchar(100) NOT NULL, PRIMARY KEY (`version`)) ENGINE=MyISAM DEFAULT CHARSET=latin1; INSERT INTO sqldiff values(\"%s\")' test_%s" % (app.params.user, app.params.revision, app.params.dbname))
 		
 		# cleaning up
-		print commands.getoutput("rm %s" % tmp_file)
+		print commands.getoutput("rm %s" % tmp_schema)
 	
 	print "Done"
 
@@ -34,6 +40,8 @@ preparedb.add_param("-d", "--dbname", help="prepare a comparison db for internal
 preparedb.add_param("-m", "--mysqlpath", help="mysql executable path", default="/Applications/XAMPP/xamppfiles/bin/mysql", action="store")
 preparedb.add_param("-u", "--user", help="mysql user", default="root", action="store")
 preparedb.add_param("-p", "--password", help="enable ask password", default=False, action="store_true")
+
+preparedb.add_param("revision", help="revision number for this commit", action="store")
 
 if __name__ == "__main__":
     preparedb.run()

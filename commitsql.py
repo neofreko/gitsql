@@ -15,6 +15,7 @@ def commitsql(app):
 	if (app.params.password):
 		min_p = '-p'
 
+	# be warned that AUTOINCREMENT is also considered schema change!!
 	print commands.getoutput('%s -u %s -h localhost %s test_%s %s > %s' % (app.params.mysqldiff, app.params.user, min_p, app.params.dbname, app.params.dbname, tmp_file))
 
 	print "sql diff:"
@@ -30,7 +31,16 @@ def commitsql(app):
 	# commit sql if successful
 	print "sql diff applied to test_db. Committing changes to git.."
 	commands.getoutput('cat %s > sql-diff.sql' % tmp_file)
-	print commands.getoutput('git commit sql-diff.sql -m "sql diff %s"' % strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
+	print commands.getoutput('git commit sql-diff.sql -m "sql diff %s"' % strftime("%a, %d %b %Y %H:%M:%S", gmtime()))
+
+	# update version
+	revision = commands.getoutput("git log --reverse --pretty=format:\"%%h\" sql-diff.sql")
+
+	successful = commands.getstatusoutput('%s -u %s -h localhost %s -e "truncate sqldiff; insert into sqldiff values(\'%s\')" test_%s' % (app.params.mysqlpath, app.params.user, min_p, revision, app.params.dbname))
+	
+	if (successful[0] != 0):
+		print "Unable to bump schema version. You need to manually update sqldiff table in test_%s with '%s'" % (app.params.dbname, revision)
+		return successful[0];
 
 	#cleaning up
 	print commands.getoutput("rm %s" % tmp_file)
@@ -39,7 +49,8 @@ commitsql.add_param("-d", "--dbname", help="prepare a comparison db for internal
 commitsql.add_param("-m", "--mysqldiff", help="mysqldiff executable path", default="mysqldiff", action="store")
 commitsql.add_param("-u", "--user", help="mysql user", default="root", action="store")
 commitsql.add_param("-p", "--password", help="enable ask password", default=False, action="store_true")
-commitsql.add_param("-x", "--mysqlpath", help="mysql executable path", default="/Applications/XAMPP/xamppfiles/bin/mysql", action="store")
+commitsql.add_param("-x", "--mysqlpath", help="mysql executable path", default="mysql", action="store")
+#commitsql.add_param("revision", help="revision number for this commit", action="store")
 
 
 if __name__ == "__main__":
