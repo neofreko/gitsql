@@ -10,12 +10,12 @@ Steps:
 
 1. Prepare DBs. Prepare DB will require you to have at least one prior commit.
 
-  python ~/Documents/SOURCES/sql-sync/preparedb.py -d <database name>
+  python ~/Documents/SOURCES/sql-sync/preparedb.py -d &lt;database name&gt;
 
 2. place the pre-commit and post-pull hook
 
   ###pre-commit
-  python ./commitsql.py -d <database name>
+  python ./commitsql.py -d &lt;database name&gt;
 
   ###post-merge
   tbd
