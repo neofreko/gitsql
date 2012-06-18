@@ -10,6 +10,14 @@ def preparedb(app):
 	min_p = ''
 	if (app.params.password):
 		min_p = '-p'
+
+	if (app.params.revision == False):
+		rev = commands.getoutput("git log --pretty=format:\"%h\"")
+		if (rev and not ("fatal" in rev)):
+			app.params.revision = rev
+		else:
+			print "You need at least 1 commit before preparing the db"
+			exit(1)
 	
 	#print "%s -u %s %s -e 'create database %s'" % (app.params.mysqlpath, app.params.user, min_p, app.params.dbname)
 	
@@ -41,7 +49,7 @@ preparedb.add_param("-m", "--mysqlpath", help="mysql executable path", default="
 preparedb.add_param("-u", "--user", help="mysql user", default="root", action="store")
 preparedb.add_param("-p", "--password", help="enable ask password", default=False, action="store_true")
 
-preparedb.add_param("revision", help="revision number for this commit", action="store")
+preparedb.add_param("-r", "--revision", help="revision number for this commit", default=False, action="store")
 
 if __name__ == "__main__":
     preparedb.run()
