@@ -5,6 +5,14 @@ import time
 
 @cli.app.CommandLineApp
 def updateschema(app):
+	if (app.params.revision == False):
+		rev = commands.getoutput("git log --pretty=format:\"%h\" -n 1")
+		if (rev and not ("fatal" in rev)):
+			app.params.revision = rev
+		else:
+			print "Cannot get revision number!"
+			exit(1)
+
 	if (app.params.password):
 		print "I will need mysql password for user '%s'\n" % app.params.user
 	min_p = ''
@@ -41,7 +49,7 @@ updateschema.add_param("-m", "--mysqlpath", help="mysql executable path", defaul
 updateschema.add_param("-u", "--user", help="mysql user", default="root", action="store")
 updateschema.add_param("-p", "--password", help="enable ask password", default=False, action="store_true")
 
-updateschema.add_param("revision", help="revision number to match", action="store")
+updateschema.add_param("-r", "--revision", help="revision number for this commit", default=False, action="store")
 
 if __name__ == "__main__":
     updateschema.run()
