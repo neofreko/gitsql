@@ -12,7 +12,7 @@ def preparedb(app):
 		min_p = '-p'
 
 	if (app.params.revision == False):
-		rev = commands.getoutput("git log --pretty=format:\"%h\"")
+		rev = commands.getoutput("git log --pretty=format:\"%h\" -n 1")
 		if (rev and not ("fatal" in rev)):
 			app.params.revision = rev
 		else:
@@ -30,13 +30,20 @@ def preparedb(app):
 		#sync from origin
 		tmp_schema = "/tmp/%s-schema.sql" % app.params.dbname
 		print "Copying schema.."
-		print commands.getoutput("mysqldump -n -d -u %s %s > %s" % (app.params.user, app.params.dbname, tmp_schema))
+		mdump = commands.getoutput("mysqldump -n -d -u %s %s > %s" % (app.params.user, app.params.dbname, tmp_schema))
+		if ("ERROR" in mdump):
+			print "Unable to dump database %s" % app.params.dbname
+			exit(1)
+		print "importing initial schema.."
 		print commands.getoutput("mysql -u %s -e 'source %s;' %s" % (app.params.user, tmp_schema, app.params.dbname))
 
 		# create version table (sqldiff) on subject db
+		print "creating revision table sqldiff on subject db: %s .." % app.params.dbname
 		print commands.getoutput("mysql -u %s -e  'CREATE TABLE `sqldiff` ( `version` varchar(100) NOT NULL, PRIMARY KEY (`version`)) ENGINE=MyISAM DEFAULT CHARSET=latin1; INSERT INTO sqldiff values(\"%s\")' %s" % (app.params.user, app.params.revision, app.params.dbname))
 
 		# create version table (sqldiff) on test_db
+		print "creating revision table sqldiff on test_%s" % app.params.dbname
+		print "mysql -u %s -e  'CREATE TABLE `sqldiff` ( `version` varchar(100) NOT NULL, PRIMARY KEY (`version`)) ENGINE=MyISAM DEFAULT CHARSET=latin1; INSERT INTO sqldiff values(\"%s\")' test_%s" % (app.params.user, app.params.revision, app.params.dbname)
 		print commands.getoutput("mysql -u %s -e  'CREATE TABLE `sqldiff` ( `version` varchar(100) NOT NULL, PRIMARY KEY (`version`)) ENGINE=MyISAM DEFAULT CHARSET=latin1; INSERT INTO sqldiff values(\"%s\")' test_%s" % (app.params.user, app.params.revision, app.params.dbname))
 		
 		# cleaning up
